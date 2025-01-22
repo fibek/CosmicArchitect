@@ -4,20 +4,12 @@
 int main() {
     webui::window win;
     
-    // Show the window with initial HTML content
-    win.show(R"(
-        <html>
-        <head>
-            <script src="webui.js"></script>
-            <title>Cosmic Architect</title>
-        </head>
-        <body>
-            <h1>Cosmic Architect</h1>
-            <p>Welcome to the universe simulator!</p>
-        </body>
-        </html>
-    )");
-
+    // Set the base directory for UI files
+    win.set_root_folder("../ui");
+    
+    // Show the UI starting with index.html
+    win.show("index.html");
+    
     // Wait for the window
     webui::wait();
     return 0;
