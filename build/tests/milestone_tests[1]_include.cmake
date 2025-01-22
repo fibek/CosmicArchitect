@@ -1,0 +1,5 @@
+if(EXISTS "/home/fibek/prog/put/sem3/prog_obiektowe/CosmicArchitect/build/tests/milestone_tests[1]_tests.cmake")
+  include("/home/fibek/prog/put/sem3/prog_obiektowe/CosmicArchitect/build/tests/milestone_tests[1]_tests.cmake")
+else()
+  add_test(milestone_tests_NOT_BUILT milestone_tests_NOT_BUILT)
+endif()
