@@ -58,4 +58,8 @@ docker-compose.yml
 Thumbs.db
 *.json
 !package.json
-!package-lock.json 
+!package-lock.json
+
+# New files and directories
+build/
+*.a 
