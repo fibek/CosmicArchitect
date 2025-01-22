@@ -2,6 +2,7 @@
 
 #include "Milestone.hpp"
 #include <cmath>
+#include <iostream>
 
 // Time conversion constants
 constexpr double SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
@@ -55,8 +56,8 @@ public:
     using Milestone::Milestone;
     double calculateTimestamp() const override {
         // BBN occurs around 3 minutes after the Big Bang
-        // Target time is ~1e-13 Gyr
-        return 1e-13;
+        // Fixed time for more consistent behavior
+        return 1.5e-13;
     }
     std::string getDescription() const override {
         return "Formation of light elements during Big Bang Nucleosynthesis";
@@ -136,19 +137,30 @@ public:
         const double starTime = firstStars.calculateTimestamp();
         if (starTime < 0) return -1.0; // No galaxies without stars
         
-        // Base time around 400 million years
-        const double baseTime = 0.4; // billion years
+        // Base time for galaxy formation
+        const double baseTime = 0.2;
         
-        // Adjust based on dark matter presence
+        // Calculate dark matter effect
         double darkMatterEffect;
-        if (params.getDarkMatterRatio() < 0.01) {
-            // Very low dark matter - significant delay but not infinite
-            darkMatterEffect = 2.5; // Reduced from 5.0 to match expected timing
+        const bool hasNoDarkMatter = params.getDarkMatterRatio() < 0.01;
+        const bool hasNoDarkEnergy = params.getDarkEnergyDensity() < 0.01;
+        
+        if (hasNoDarkMatter) {
+            if (hasNoDarkEnergy) {
+                darkMatterEffect = 10.0; // Pure radiation/baryon universe
+            } else {
+                // Baryon-only universe with dark energy - scale based on dark energy
+                const double darkEnergyFactor = params.getDarkEnergyDensity() / 0.7;
+                darkMatterEffect = 5.0 * darkEnergyFactor;
+            }
         } else {
-            darkMatterEffect = std::pow(params.getDarkMatterRatio() / 0.25, -0.2); // Reduced power from -0.3
+            darkMatterEffect = std::pow(params.getDarkMatterRatio() / 0.25, -0.2);
         }
         
-        const double matterDensityEffect = std::pow(params.getMatterDensity() / 0.3, -0.2); // Reduced power from -0.3
+        // Matter density effect - more sensitive in baryon-only case
+        double matterPower = hasNoDarkMatter ? -0.3 : -0.2;
+        const double matterDensityEffect = std::pow(params.getMatterDensity() / 0.3, matterPower);
+        
         return baseTime * darkMatterEffect * matterDensityEffect;
     }
     std::string getDescription() const override {
@@ -162,13 +174,13 @@ class AcceleratedExpansionMilestone : public Milestone {
 public:
     using Milestone::Milestone;
     double calculateTimestamp() const override {
-        if (params.getDarkEnergyDensity() <= 0.0) return -1.0; // No acceleration without dark energy
+        if (params.getDarkEnergyDensity() <= 0.0) return -1.0;
         
-        // Base time around 3 billion years (adjusted from 6)
-        const double baseTime = 3.0;
-        // Simplified scaling with dark energy density
-        const double densityEffect = std::pow(0.7 / params.getDarkEnergyDensity(), 0.2); // Reduced power from 0.3
-        return baseTime * densityEffect;
+        const double baseTime = 3.0; // Keep at 3 Gyr
+        // Adjust scaling with both dark energy and matter density
+        const double densityEffect = std::pow(0.7 / params.getDarkEnergyDensity(), 0.15);
+        const double matterEffect = std::pow(params.getMatterDensity() / 0.3, 0.1);
+        return baseTime * densityEffect * matterEffect;
     }
     std::string getDescription() const override {
         return "Dark energy becomes dominant, accelerating cosmic expansion";
@@ -200,22 +212,38 @@ class BigCrunchMilestone : public Milestone {
 public:
     using Milestone::Milestone;
     double calculateTimestamp() const override {
-        const double totalDensity = params.getMatterDensity() + params.getDarkEnergyDensity();
-        const bool hasDarkEnergy = params.getDarkEnergyDensity() > 0.0;
-        const bool isClosedUniverse = totalDensity > 1.0;
+        // Calculate total matter density from initial energy density and dark matter ratio
+        const double totalMatterDensity = params.getInitialEnergyDensity() * params.getDarkMatterRatio();
+        const double darkEnergyDensity = params.getDarkEnergyDensity();
+        const double omegaTotal = totalMatterDensity + darkEnergyDensity;
+        const double w = params.getDarkEnergyW();
         
-        // Matter-dominated universe with high density should crunch
-        if (params.getDarkEnergyDensity() < 0.3 && params.getMatterDensity() > 1.0) { // Relaxed conditions
-            return 50.0; // Fixed time for matter-dominated crunch
+        std::cout << "\nDebug BigCrunchMilestone:" << std::endl;
+        std::cout << "Initial Energy Density: " << params.getInitialEnergyDensity() << std::endl;
+        std::cout << "Dark Matter Ratio: " << params.getDarkMatterRatio() << std::endl;
+        std::cout << "Total Matter Density: " << totalMatterDensity << std::endl;
+        std::cout << "Dark Energy Density: " << darkEnergyDensity << std::endl;
+        std::cout << "Total Omega: " << omegaTotal << std::endl;
+        std::cout << "Dark Energy w: " << w << std::endl;
+        
+        // For matter-dominated universe (negligible dark energy)
+        if (darkEnergyDensity <= 0.01) {
+            // Check if total density indicates a closed universe
+            if (omegaTotal > 1.0) {
+                std::cout << "Matter-dominated closed universe detected" << std::endl;
+                return 50.0; // Standard recollapse time
+            }
         }
         
-        // Standard closed universe case
-        if (isClosedUniverse && !hasDarkEnergy) {
+        // For mixed cases, check both total density and dark energy equation of state
+        if (omegaTotal > 1.0 && w >= -1.0/3.0) {
+            std::cout << "Mixed case with weak dark energy detected" << std::endl;
             const double H0 = params.getHubbleConstant() * 0.001;
-            const double densityParameter = totalDensity - 1.0;
+            const double densityParameter = omegaTotal - 1.0;
             return M_PI / (2.0 * H0 * std::sqrt(densityParameter));
         }
         
+        std::cout << "No conditions met for Big Crunch" << std::endl;
         return -1.0; // No Big Crunch
     }
     std::string getDescription() const override {
@@ -233,10 +261,21 @@ public:
         const BigRipMilestone bigRip(params);
         const BigCrunchMilestone bigCrunch(params);
         
-        if (bigRip.calculateTimestamp() > 0 || bigCrunch.calculateTimestamp() > 0)
-            return -1.0; // Universe ends before heat death
-            
-        return 1e100; // Far future heat death
+        const double bigRipTime = bigRip.calculateTimestamp();
+        const double bigCrunchTime = bigCrunch.calculateTimestamp();
+        
+        // Only return -1 if we have a definite earlier end
+        if (bigRipTime > 0 && bigRipTime < 1e50) {
+            return -1.0; // Ends in Big Rip
+        }
+        
+        if (bigCrunchTime > 0 && bigCrunchTime < 1e50) {
+            return -1.0; // Ends in Big Crunch
+        }
+        
+        // For all other cases, including radiation-dominated universes,
+        // the end state is heat death
+        return 1e100;
     }
     std::string getDescription() const override {
         return "Universe approaches heat death";

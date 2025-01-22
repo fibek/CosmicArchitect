@@ -10,6 +10,7 @@ public:
         , matterAntimatterRatio(1e-9)
         , darkEnergyW(-1.0)
         , darkMatterRatio(0.25)
+        , initialEnergyDensity(1.0)
     {}
 
     // Existing constructor
@@ -24,6 +25,7 @@ public:
         , matterAntimatterRatio(matterAntimatterRatio)
         , darkEnergyW(darkEnergyW)
         , darkMatterRatio(0.25)
+        , initialEnergyDensity(1.0)
     {}
 
     // Getters
@@ -33,6 +35,7 @@ public:
     double getMatterAntimatterRatio() const { return matterAntimatterRatio; }
     double getDarkEnergyW() const { return darkEnergyW; }
     double getDarkMatterRatio() const { return darkMatterRatio; }
+    double getInitialEnergyDensity() const { return initialEnergyDensity; }
 
     // Setters
     void setMatterDensity(double value) { matterDensity = value; }
@@ -41,7 +44,7 @@ public:
     void setMatterAntimatterRatio(double value) { matterAntimatterRatio = value; }
     void setDarkEnergyW(double value) { darkEnergyW = value; }
     void setDarkMatterRatio(double value) { darkMatterRatio = value; }
-    void setInitialEnergyDensity(double value) { /* Placeholder for compatibility */ }
+    void setInitialEnergyDensity(double value) { initialEnergyDensity = value; }
 
 private:
     double matterDensity;        // Ω_m - density parameter for matter
@@ -50,4 +53,5 @@ private:
     double matterAntimatterRatio;// η - baryon-to-photon ratio
     double darkEnergyW;          // w - dark energy equation of state
     double darkMatterRatio;      // Ratio of dark matter to total matter
+    double initialEnergyDensity; // Total initial energy density
 }; 
