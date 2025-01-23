@@ -1,0 +1,3 @@
+[submodule "frontend/webui"]
+	path = frontend/webui
+	url = https://github.com/webui-dev/webui.git
