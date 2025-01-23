@@ -1,5 +1,0 @@
-if(EXISTS "/home/fibek/prog/put/sem3/prog_obiektowe/CosmicArchitect/build/tests/cosmic_tests[1]_tests.cmake")
-  include("/home/fibek/prog/put/sem3/prog_obiektowe/CosmicArchitect/build/tests/cosmic_tests[1]_tests.cmake")
-else()
-  add_test(cosmic_tests_NOT_BUILT cosmic_tests_NOT_BUILT)
-endif()
