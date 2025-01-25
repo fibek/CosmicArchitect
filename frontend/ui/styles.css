@@ -2,12 +2,16 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f0f2f5;
+    background: #f0f2f5;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .dashboard {
@@ -24,49 +28,60 @@ body {
 }
 
 .form-group {
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-group label {
-    display: block;
+    font-size: 0.9em;
+    color: #666;
     margin-bottom: 5px;
-    font-weight: bold;
 }
 
 .form-group input {
-    width: 100%;
-    padding: 8px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1em;
+}
+
+.form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
 }
 
 button {
-    background: #1a73e8;
+    padding: 10px 20px;
+    background: #007bff;
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 1em;
 }
 
 button:hover {
-    background: #1557b0;
+    background: #0056b3;
 }
 
 .universe-list {
-    list-style: none;
-    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .universe-item {
-    padding: 15px;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.universe-item:hover {
-    background: #f8f9fa;
+.universe-item h3 {
+    margin: 0 0 10px 0;
+    color: #333;
 }
 
 .header {
@@ -78,20 +93,159 @@ button:hover {
 
 .tabs {
     display: flex;
+    gap: 10px;
     margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
 }
 
 .tab {
     padding: 10px 20px;
+    background: none;
+    border: none;
+    color: #666;
     cursor: pointer;
+    font-size: 1em;
     border-bottom: 2px solid transparent;
+    margin-bottom: -12px;
 }
 
 .tab.active {
-    border-bottom-color: #1a73e8;
-    color: #1a73e8;
+    color: #007bff;
+    border-bottom-color: #007bff;
 }
 
 #universe-detail {
     display: none;
+}
+
+/* Timeline styling */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 50px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #007bff;
+}
+
+.milestone {
+    position: relative;
+    margin: 30px 0;
+    padding-left: 100px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.milestone::before {
+    content: '';
+    position: absolute;
+    left: 44px;
+    top: 15px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #007bff;
+    border: 2px solid white;
+    box-shadow: 0 0 0 3px #007bff;
+}
+
+.milestone-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    margin-right: 20px;
+    object-fit: cover;
+}
+
+.milestone-content {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.milestone-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.milestone-time {
+    font-size: 0.9em;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.milestone-description {
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Form styling */
+.universe-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Parameter explanations */
+.param-item .param-explanation {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+    display: none;
+}
+
+.param-item:hover .param-explanation {
+    display: block;
+}
+
+/* Universe parameters display */
+.universe-info {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.param-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.param-item {
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.param-label {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.param-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
 } 
