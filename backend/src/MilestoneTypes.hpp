@@ -3,6 +3,7 @@
 #include "Milestone.hpp"
 #include <cmath>
 #include <iostream>
+#include "UniverseParameters.hpp"
 
 // Time conversion constants
 constexpr double SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
@@ -19,8 +20,8 @@ public:
     std::string getDescription() const override {
         return "The universe begins in an incredibly hot, dense state";
     }
-    std::string getAssetId() const override { return "big_bang_01"; }
     MilestoneType getType() const override { return MilestoneType::BigBang; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_bigbang"; }
 };
 
 class InflationMilestone : public Milestone {
@@ -33,8 +34,8 @@ public:
     std::string getDescription() const override {
         return "The universe undergoes rapid exponential expansion";
     }
-    std::string getAssetId() const override { return "inflation_01"; }
     MilestoneType getType() const override { return MilestoneType::Inflation; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_inflation"; }
 };
 
 class ParticleEraMilestone : public Milestone {
@@ -47,11 +48,11 @@ public:
     std::string getDescription() const override {
         return "Formation of quarks and leptons";
     }
-    std::string getAssetId() const override { return "particle_era_01"; }
     MilestoneType getType() const override { return MilestoneType::ParticleEra; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_particleera"; }
 };
 
-class NucleosynthesisMilestone : public Milestone {
+class NucleosynthesisBBNMilestone : public Milestone {
 public:
     using Milestone::Milestone;
     double calculateTimestamp() const override {
@@ -62,8 +63,8 @@ public:
     std::string getDescription() const override {
         return "Formation of light elements during Big Bang Nucleosynthesis";
     }
-    std::string getAssetId() const override { return "nucleosynthesis_01"; }
     MilestoneType getType() const override { return MilestoneType::NucleosynthesisBBN; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_nucleosynthesis"; }
 };
 
 class RecombinationMilestone : public Milestone {
@@ -80,8 +81,8 @@ public:
     std::string getDescription() const override {
         return "The universe becomes transparent as electrons bind to nuclei";
     }
-    std::string getAssetId() const override { return "recombination_01"; }
     MilestoneType getType() const override { return MilestoneType::Recombination; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_recombination"; }
 };
 
 class DarkAgesMilestone : public Milestone {
@@ -95,8 +96,8 @@ public:
     std::string getDescription() const override {
         return "Period before the first stars, universe is dark and filled with hydrogen";
     }
-    std::string getAssetId() const override { return "dark_ages_01"; }
     MilestoneType getType() const override { return MilestoneType::DarkAges; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_darkages"; }
 };
 
 class FirstStarsMilestone : public Milestone {
@@ -124,8 +125,16 @@ public:
     std::string getDescription() const override {
         return "The first stars begin to shine, ending the cosmic dark ages";
     }
-    std::string getAssetId() const override { return "first_stars_01"; }
     MilestoneType getType() const override { return MilestoneType::FirstStars; }
+    std::string getAssetId(const UniverseParameters& params) const override {
+        if (params.getMatterAntimatterRatio() < 1e-11) {
+            return "milestone_firststars_none"; // No star formation possible
+        }
+        if (params.getDarkMatterRatio() < 0.01) {
+            return "milestone_firststars_delayed"; // Delayed star formation
+        }
+        return "milestone_firststars";
+    }
 };
 
 class GalaxyFormationMilestone : public Milestone {
@@ -166,8 +175,19 @@ public:
     std::string getDescription() const override {
         return "Galaxies begin to form and cluster";
     }
-    std::string getAssetId() const override { return "galaxy_formation_01"; }
     MilestoneType getType() const override { return MilestoneType::GalaxyFormation; }
+    std::string getAssetId(const UniverseParameters& params) const override {
+        if (params.getMatterAntimatterRatio() < 1e-11) {
+            return "milestone_galaxies_none"; // No galaxies possible
+        }
+        if (params.getDarkMatterRatio() < 0.01) {
+            if (params.getDarkEnergyDensity() < 0.01) {
+                return "milestone_galaxies_baryon"; // Pure baryon universe
+            }
+            return "milestone_galaxies_nodm"; // No dark matter
+        }
+        return "milestone_galaxies";
+    }
 };
 
 class AcceleratedExpansionMilestone : public Milestone {
@@ -185,8 +205,13 @@ public:
     std::string getDescription() const override {
         return "Dark energy becomes dominant, accelerating cosmic expansion";
     }
-    std::string getAssetId() const override { return "acceleration_01"; }
     MilestoneType getType() const override { return MilestoneType::AcceleratedExpansion; }
+    std::string getAssetId(const UniverseParameters& params) const override {
+        if (params.getDarkEnergyDensity() > 0.8) {
+            return "milestone_expansion_strong"; // Strong dark energy dominance
+        }
+        return "milestone_expansion";
+    }
 };
 
 class BigRipMilestone : public Milestone {
@@ -204,8 +229,13 @@ public:
     std::string getDescription() const override {
         return "Universe undergoes a Big Rip due to phantom dark energy";
     }
-    std::string getAssetId() const override { return "big_rip_01"; }
     MilestoneType getType() const override { return MilestoneType::BigRip; }
+    std::string getAssetId(const UniverseParameters& params) const override {
+        if (params.getDarkEnergyW() < -2.0) {
+            return "milestone_bigrip_violent"; // Extremely violent end
+        }
+        return "milestone_bigrip";
+    }
 };
 
 class BigCrunchMilestone : public Milestone {
@@ -218,39 +248,33 @@ public:
         const double omegaTotal = totalMatterDensity + darkEnergyDensity;
         const double w = params.getDarkEnergyW();
         
-        std::cout << "\nDebug BigCrunchMilestone:" << std::endl;
-        std::cout << "Initial Energy Density: " << params.getInitialEnergyDensity() << std::endl;
-        std::cout << "Dark Matter Ratio: " << params.getDarkMatterRatio() << std::endl;
-        std::cout << "Total Matter Density: " << totalMatterDensity << std::endl;
-        std::cout << "Dark Energy Density: " << darkEnergyDensity << std::endl;
-        std::cout << "Total Omega: " << omegaTotal << std::endl;
-        std::cout << "Dark Energy w: " << w << std::endl;
-        
         // For matter-dominated universe (negligible dark energy)
         if (darkEnergyDensity <= 0.01) {
             // Check if total density indicates a closed universe
             if (omegaTotal > 1.0) {
-                std::cout << "Matter-dominated closed universe detected" << std::endl;
                 return 50.0; // Standard recollapse time
             }
         }
         
         // For mixed cases, check both total density and dark energy equation of state
         if (omegaTotal > 1.0 && w >= -1.0/3.0) {
-            std::cout << "Mixed case with weak dark energy detected" << std::endl;
             const double H0 = params.getHubbleConstant() * 0.001;
             const double densityParameter = omegaTotal - 1.0;
             return M_PI / (2.0 * H0 * std::sqrt(densityParameter));
         }
         
-        std::cout << "No conditions met for Big Crunch" << std::endl;
         return -1.0; // No Big Crunch
     }
     std::string getDescription() const override {
         return "Universe collapses in a Big Crunch";
     }
-    std::string getAssetId() const override { return "big_crunch_01"; }
     MilestoneType getType() const override { return MilestoneType::BigCrunch; }
+    std::string getAssetId(const UniverseParameters& params) const override {
+        if (params.getMatterDensity() > 2.0) {
+            return "milestone_bigcrunch_rapid"; // Rapid collapse
+        }
+        return "milestone_bigcrunch";
+    }
 };
 
 class HeatDeathMilestone : public Milestone {
@@ -280,8 +304,8 @@ public:
     std::string getDescription() const override {
         return "Universe approaches heat death";
     }
-    std::string getAssetId() const override { return "heat_death_01"; }
     MilestoneType getType() const override { return MilestoneType::HeatDeath; }
+    std::string getAssetId(const UniverseParameters&) const override { return "milestone_heatdeath"; }
 };
 
 // Factory function implementation
@@ -294,7 +318,7 @@ inline std::unique_ptr<Milestone> createMilestone(MilestoneType type, const Univ
         case MilestoneType::ParticleEra:
             return std::make_unique<ParticleEraMilestone>(params);
         case MilestoneType::NucleosynthesisBBN:
-            return std::make_unique<NucleosynthesisMilestone>(params);
+            return std::make_unique<NucleosynthesisBBNMilestone>(params);
         case MilestoneType::Recombination:
             return std::make_unique<RecombinationMilestone>(params);
         case MilestoneType::DarkAges:

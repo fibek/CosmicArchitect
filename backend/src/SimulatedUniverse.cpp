@@ -1,66 +1,54 @@
 #include "SimulatedUniverse.hpp"
 #include "MilestoneTypes.hpp"
+#include <memory>
 #include <cmath>
 
-SimulatedUniverse::SimulatedUniverse(double matterDensity,
-                                   double darkEnergyDensity,
-                                   double hubbleConstant,
-                                   double matterAntimatterRatio,
-                                   double darkEnergyW)
-    : Universe(matterDensity,
-              darkEnergyDensity,
-              hubbleConstant,
-              matterAntimatterRatio,
-              darkEnergyW)
-{}
+SimulatedUniverse::SimulatedUniverse(std::string name, double matterDensity, double darkEnergyDensity, 
+                                   double hubbleConstant, double matterAntimatterRatio, double darkEnergyW)
+    : Universe(matterDensity, darkEnergyDensity, hubbleConstant, 
+              matterAntimatterRatio, darkEnergyW, std::move(name)) {
+}
 
 std::unique_ptr<Timeline> SimulatedUniverse::generateTimeline() {
     auto timeline = std::make_unique<Timeline>();
     UniverseParameters params(matterDensity, darkEnergyDensity, hubbleConstant, 
                             matterAntimatterRatio, darkEnergyW);
     
-    // Always add Big Bang
+    // Always add Big Bang at t=0
     timeline->addMilestone(createMilestone(MilestoneType::BigBang, params));
     
-    // Always add Inflation
+    // Early universe events
     timeline->addMilestone(createMilestone(MilestoneType::Inflation, params));
-    
-    // Always add Particle Era
     timeline->addMilestone(createMilestone(MilestoneType::ParticleEra, params));
+    timeline->addMilestone(createMilestone(MilestoneType::NucleosynthesisBBN, params));
     
-    // Add Nucleosynthesis if matter-antimatter ratio is sufficient
-    if (matterAntimatterRatio >= 1e-11) {
-        timeline->addMilestone(createMilestone(MilestoneType::NucleosynthesisBBN, params));
-    }
-    
-    // Always add Recombination
+    // Matter formation events
     timeline->addMilestone(createMilestone(MilestoneType::Recombination, params));
-    
-    // Always add Dark Ages
     timeline->addMilestone(createMilestone(MilestoneType::DarkAges, params));
     
-    // Add First Stars if matter-antimatter ratio is sufficient
-    if (matterAntimatterRatio >= 1e-11) {
+    // Structure formation events (if conditions allow)
+    if (matterDensity >= 0.1) {  // Minimum matter density for star formation
         timeline->addMilestone(createMilestone(MilestoneType::FirstStars, params));
-    }
-    
-    // Add Galaxy Formation if matter density is sufficient
-    if (matterDensity >= 0.05) {
         timeline->addMilestone(createMilestone(MilestoneType::GalaxyFormation, params));
     }
     
-    // Add Accelerated Expansion if dark energy is positive
+    // Future events based on universe parameters
     if (willUndergoAcceleration()) {
         timeline->addMilestone(createMilestone(MilestoneType::AcceleratedExpansion, params));
-    }
-    
-    // Add final fate
-    if (willUndergoRip()) {
-        timeline->addMilestone(createMilestone(MilestoneType::BigRip, params));
+        
+        if (willUndergoRip()) {
+            // Universe ends in Big Rip
+            double ripTime = calculateRipTime();
+            if (ripTime > 0) {
+                timeline->addMilestone(createMilestone(MilestoneType::BigRip, params));
+            }
+        } else {
+            // Universe expands forever and ends in Heat Death
+            timeline->addMilestone(createMilestone(MilestoneType::HeatDeath, params));
+        }
     } else if (willUndergoCollapse()) {
+        // Universe ends in Big Crunch
         timeline->addMilestone(createMilestone(MilestoneType::BigCrunch, params));
-    } else {
-        timeline->addMilestone(createMilestone(MilestoneType::HeatDeath, params));
     }
     
     return timeline;

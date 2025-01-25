@@ -4,11 +4,9 @@ add_executable(milestone_tests
     MilestoneTests.cpp
 )
 
-target_link_libraries(milestone_tests
-    PRIVATE
-    GTest::GTest
-    GTest::Main
+target_link_libraries(milestone_tests PRIVATE
     cosmic_core
+    GTest::gtest_main
 )
 
 include(GoogleTest)

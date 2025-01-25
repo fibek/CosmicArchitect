@@ -19,4 +19,10 @@ add_subdirectory(src)
 
 # Enable testing
 enable_testing()
-add_subdirectory(tests) 
+add_subdirectory(tests)
+
+# Export include directories
+target_include_directories(cosmic_core
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+) 

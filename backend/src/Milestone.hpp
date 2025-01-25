@@ -34,15 +34,15 @@ public:
         j["type"] = static_cast<int>(getType());
         j["timestamp"] = calculateTimestamp();
         j["description"] = getDescription();
-        j["assetId"] = getAssetId();
+        j["assetId"] = getAssetId(params);
         return j;
     }
 
     // Pure virtual methods that derived classes must implement
     virtual double calculateTimestamp() const = 0;
     virtual std::string getDescription() const = 0;
-    virtual std::string getAssetId() const = 0;
     virtual MilestoneType getType() const = 0;
+    virtual std::string getAssetId(const UniverseParameters& params) const = 0;
 
 protected:
     const UniverseParameters& params;

@@ -5,11 +5,12 @@ int main() {
     try {
         // Create a universe with some initial parameters
         SimulatedUniverse universe(
-            1.0,    // initialEnergyDensity
-            0.27,   // darkMatterRatio (27% of the universe)
-            0.68,   // darkEnergyDensity (68% of the universe)
-            67.4,   // expansionRate (Hubble constant in km/s/Mpc)
-            1e-10   // matterAntimatterRatio
+            "Test Universe",  // name
+            0.27,            // matterDensity (27% of the universe)
+            0.68,            // darkEnergyDensity (68% of the universe)
+            67.4,            // hubbleConstant (in km/s/Mpc)
+            1e-10,           // matterAntimatterRatio
+            -1.0             // darkEnergyW (cosmological constant)
         );
 
         // Generate timeline
