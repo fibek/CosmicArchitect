@@ -1,5 +1,18 @@
 #include "UniverseDB.hpp"
 #include <algorithm>
+#include <cctype>
+
+// Helper function for case-insensitive string comparison
+static bool containsIgnoreCase(const std::string& str, std::string_view term) {
+    auto it = std::search(
+        str.begin(), str.end(),
+        term.begin(), term.end(),
+        [](char ch1, char ch2) {
+            return std::tolower(ch1) == std::tolower(ch2);
+        }
+    );
+    return it != str.end();
+}
 
 int UniverseDB::addUniverse(std::unique_ptr<SimulatedUniverse> universe) {
     std::lock_guard<std::mutex> lock(universes_mutex);
@@ -33,11 +46,9 @@ std::vector<std::reference_wrapper<SimulatedUniverse>> UniverseDB::searchUnivers
     std::lock_guard<std::mutex> lock(universes_mutex);
     std::vector<std::reference_wrapper<SimulatedUniverse>> result;
     
-    for (size_t i = 0; i < universes.size(); ++i) {
-        if (universes[i]) {  // Check if the universe pointer is valid
-            // For now, we'll just return all universes since we don't have a name/search criteria yet
-            // TODO: Implement actual search logic when universe naming is added
-            result.push_back(std::ref(*universes[i]));
+    for (const auto& universe : universes) {
+        if (universe && containsIgnoreCase(universe->getName(), term)) {
+            result.push_back(std::ref(*universe));
         }
     }
     return result;
