@@ -3,16 +3,21 @@
 
 #include "Universe.hpp"
 #include "Timeline.hpp"
+#include "IExportable.hpp"
 #include <memory>
 #include <string>
 
-class SimulatedUniverse : public Universe {
+class SimulatedUniverse : public Universe, public IExportable {
 public:
     SimulatedUniverse(std::string name, double matterDensity, double darkEnergyDensity, 
                      double hubbleConstant, double matterAntimatterRatio, double darkEnergyW);
 
-    // Implementation of pure virtual method
-    std::unique_ptr<Timeline> generateTimeline() override;
+    // Implementation of pure virtual method from Universe
+    std::unique_ptr<Timeline> generateTimeline() const override;
+
+    // Implementation of IExportable interface
+    std::string toJSON() const override;
+    std::string toCSV() const override;
 
 private:
     // Helper methods for milestone creation

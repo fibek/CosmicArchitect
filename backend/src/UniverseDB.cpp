@@ -56,4 +56,20 @@ size_t UniverseDB::getUniverseCount() const {
     std::lock_guard<std::mutex> lock(universes_mutex);
     return std::count_if(universes.begin(), universes.end(), 
                         [](const auto& u) { return u != nullptr; });
+}
+
+std::optional<std::string> UniverseDB::exportToJSON(int id) const {
+    std::lock_guard<std::mutex> lock(universes_mutex);
+    if (id >= 0 && id < static_cast<int>(universes.size()) && universes[id]) {
+        return universes[id]->toJSON();
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> UniverseDB::exportToCSV(int id) const {
+    std::lock_guard<std::mutex> lock(universes_mutex);
+    if (id >= 0 && id < static_cast<int>(universes.size()) && universes[id]) {
+        return universes[id]->toCSV();
+    }
+    return std::nullopt;
 } 

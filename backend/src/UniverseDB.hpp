@@ -30,6 +30,10 @@ public:
     bool removeUniverse(int id);
     size_t getUniverseCount() const;
 
+    // Export methods
+    std::optional<std::string> exportToJSON(int id) const;
+    std::optional<std::string> exportToCSV(int id) const;
+
 private:
     UniverseDB() = default;  // Private constructor for singleton
 

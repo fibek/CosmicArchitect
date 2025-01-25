@@ -2,6 +2,7 @@
 #include "MilestoneTypes.hpp"
 #include <memory>
 #include <cmath>
+#include <sstream>
 
 SimulatedUniverse::SimulatedUniverse(std::string name, double matterDensity, double darkEnergyDensity, 
                                    double hubbleConstant, double matterAntimatterRatio, double darkEnergyW)
@@ -9,7 +10,7 @@ SimulatedUniverse::SimulatedUniverse(std::string name, double matterDensity, dou
               matterAntimatterRatio, darkEnergyW, std::move(name)) {
 }
 
-std::unique_ptr<Timeline> SimulatedUniverse::generateTimeline() {
+std::unique_ptr<Timeline> SimulatedUniverse::generateTimeline() const {
     auto timeline = std::make_unique<Timeline>();
     UniverseParameters params(matterDensity, darkEnergyDensity, hubbleConstant, 
                             matterAntimatterRatio, darkEnergyW);
@@ -87,4 +88,46 @@ std::string SimulatedUniverse::selectAssetForMilestone(MilestoneType type) const
         default:
             return "default_01";
     }
+}
+
+std::string SimulatedUniverse::toJSON() const {
+    nlohmann::json j;
+    // Basic universe properties
+    j["name"] = getName();
+    j["matterDensity"] = getMatterDensity();
+    j["darkEnergyDensity"] = getDarkEnergyDensity();
+    j["hubbleConstant"] = getHubbleConstant();
+    j["matterAntimatterRatio"] = getMatterAntimatterRatio();
+    j["darkEnergyW"] = getDarkEnergyW();
+    
+    // Generate and add timeline
+    auto timeline = generateTimeline();
+    j["timeline"] = timeline->toJson();
+    
+    return j.dump(4);
+}
+
+std::string SimulatedUniverse::toCSV() const {
+    std::stringstream ss;
+    // Header row for universe parameters
+    ss << "Name,Matter Density,Dark Energy Density,Hubble Constant,Matter/Antimatter Ratio,Dark Energy W\n";
+    ss << getName() << ","
+       << getMatterDensity() << ","
+       << getDarkEnergyDensity() << ","
+       << getHubbleConstant() << ","
+       << getMatterAntimatterRatio() << ","
+       << getDarkEnergyW() << "\n\n";
+    
+    // Add timeline data
+    ss << "Timeline:\n";
+    ss << "Milestone Type,Time,Description\n";
+    
+    auto timeline = generateTimeline();
+    for (const auto& milestone : timeline->getMilestones()) {
+        ss << static_cast<int>(milestone->getType()) << ","
+           << milestone->calculateTimestamp() << ","
+           << "\"" << milestone->getDescription() << "\"\n";
+    }
+    
+    return ss.str();
 } 
