@@ -55,7 +55,13 @@
 
             <!-- Universe List -->
             <div class="panel">
-                <h2>Created Universes</h2>
+                <div class="panel-header">
+                    <h2>Created Universes</h2>
+                    <div class="export-buttons">
+                        <button onclick="exportAllUniverses('json')" class="export-btn">Export All as JSON</button>
+                        <button onclick="exportAllUniverses('csv')" class="export-btn">Export All as CSV</button>
+                    </div>
+                </div>
                 <div id="universe-list" class="universe-list">
                     <!-- Universe items will be dynamically added here -->
                 </div>
@@ -69,6 +75,12 @@
             <!-- Universe Parameters -->
             <div id="universe-params" class="universe-info">
                 <!-- Parameters will be dynamically added here -->
+            </div>
+
+            <!-- Export buttons -->
+            <div class="export-buttons">
+                <button onclick="exportUniverse('json')" class="export-btn">Export as JSON</button>
+                <button onclick="exportUniverse('csv')" class="export-btn">Export as CSV</button>
             </div>
 
             <!-- Timeline -->

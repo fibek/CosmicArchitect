@@ -100,7 +100,11 @@ function getMilestoneTitle(type) {
     return titles[type] || "Unknown Milestone";
 }
 
+let currentUniverseId = null;  // Add this at the top of the file
+
+// Update the viewUniverse function to store the current universe ID
 async function viewUniverse(id) {
+    currentUniverseId = id;  // Store the current universe ID
     try {
         console.log('Fetching universe data for ID:', id);
         const response = await webui.call('getUniverses');
@@ -225,6 +229,117 @@ document.getElementById('universe-form').addEventListener('submit', async functi
         alert('Error creating universe: ' + error.message);
     }
 });
+
+// Add the export function
+async function exportUniverse(format) {
+    if (currentUniverseId === null) {
+        alert('No universe selected');
+        return;
+    }
+
+    try {
+        // First get the universe name
+        const universeResponse = await webui.call('getUniverses');
+        const universeData = JSON.parse(universeResponse);
+        const universe = universeData.universes.find(u => u.id === currentUniverseId);
+        
+        if (!universe) {
+            throw new Error('Universe not found');
+        }
+
+        // Sanitize the name for filename (remove special characters)
+        const safeName = universe.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        // Get the export data
+        const response = await webui.call('exportUniverse', JSON.stringify({
+            id: currentUniverseId,
+            format: format
+        }));
+        
+        const data = JSON.parse(response);
+        
+        if (data.status === 'success') {
+            let exportData = data.data;
+            
+            // For JSON, format it nicely
+            if (format === 'json') {
+                const parsedData = JSON.parse(exportData);
+                exportData = JSON.stringify(parsedData, null, 2);
+            }
+            
+            // Create a download link
+            const blob = new Blob([exportData], { 
+                type: format === 'json' ? 'application/json' : 'text/csv',
+                endings: 'native'
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            // Include universe name in filename
+            a.download = `universe_${safeName}_${currentUniverseId}.${format}`;
+            
+            // Trigger download
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error exporting universe:', error);
+        alert('Error exporting universe: ' + error.message);
+    }
+}
+
+// Add the exportAllUniverses function
+async function exportAllUniverses(format) {
+    try {
+        const response = await webui.call('exportAllUniverses', JSON.stringify({
+            format: format
+        }));
+        
+        const data = JSON.parse(response);
+        
+        if (data.status === 'success') {
+            let exportData = data.data;
+            
+            // For JSON, format it nicely
+            if (format === 'json') {
+                const parsedData = JSON.parse(exportData);
+                exportData = JSON.stringify(parsedData, null, 2);
+            }
+            
+            // Create a download link
+            const blob = new Blob([exportData], { 
+                type: format === 'json' ? 'application/json' : 'text/csv',
+                endings: 'native'
+            });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            a.download = `all_universes_${timestamp}.${format}`;
+            
+            // Trigger download
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else {
+            throw new Error(data.message);
+        }
+    } catch (error) {
+        console.error('Error exporting universes:', error);
+        alert('Error exporting universes: ' + error.message);
+    }
+}
 
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {

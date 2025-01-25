@@ -166,6 +166,84 @@ void get_universes(webui::window::event* e) {
     }
 }
 
+// Add new export handlers
+void export_universe(webui::window::event* e) {
+    try {
+        auto data = json::parse(e->get_string());
+        int id = data["id"].get<int>();
+        std::string format = data["format"].get<std::string>();
+        
+        std::optional<std::string> exportData;
+        if (format == "json") {
+            exportData = UniverseDB::instance().exportToJSON(id);
+        } else if (format == "csv") {
+            exportData = UniverseDB::instance().exportToCSV(id);
+        }
+        
+        if (exportData) {
+            json response = {
+                {"status", "success"},
+                {"data", *exportData}
+            };
+            e->return_string(response.dump());
+        } else {
+            throw std::runtime_error("Universe not found");
+        }
+    } catch (const std::exception& ex) {
+        json error = {
+            {"status", "error"},
+            {"message", std::string("Export failed: ") + ex.what()}
+        };
+        e->return_string(error.dump());
+    }
+}
+
+// Add handler for exporting all universes
+void export_all_universes(webui::window::event* e) {
+    try {
+        auto data = json::parse(e->get_string());
+        std::string format = data["format"].get<std::string>();
+        
+        auto universes = UniverseDB::instance().getAllUniverses();
+        
+        if (format == "json") {
+            // Create a JSON array of all universes
+            json allUniverses = json::array();
+            for (const auto& universe : universes) {
+                std::string exportData = universe.get().toJSON();
+                allUniverses.push_back(json::parse(exportData));
+            }
+            json response = {
+                {"status", "success"},
+                {"data", allUniverses.dump(4)}
+            };
+            e->return_string(response.dump());
+        } else if (format == "csv") {
+            // Combine all universes into one CSV
+            std::stringstream combined;
+            bool first = true;
+            for (const auto& universe : universes) {
+                if (!first) {
+                    combined << "\n\n"; // Add separation between universes
+                }
+                combined << universe.get().toCSV();
+                first = false;
+            }
+            json response = {
+                {"status", "success"},
+                {"data", combined.str()}
+            };
+            e->return_string(response.dump());
+        }
+    } catch (const std::exception& ex) {
+        json error = {
+            {"status", "error"},
+            {"message", std::string("Export failed: ") + ex.what()}
+        };
+        e->return_string(error.dump());
+    }
+}
+
 int main() {
     webui::window win;
     
@@ -176,6 +254,8 @@ int main() {
     win.bind("createUniverse", create_universe);
     win.bind("getUniverses", get_universes);
     win.bind("deleteUniverse", delete_universe);
+    win.bind("exportUniverse", export_universe);
+    win.bind("exportAllUniverses", export_all_universes);  // Add new binding
     
     // Show the UI starting with index.html
     win.show("index.html");

@@ -248,4 +248,43 @@ button:hover {
     font-size: 1.2em;
     font-weight: bold;
     color: #333;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: flex-end;
+}
+
+.export-btn {
+    padding: 8px 16px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.export-btn:hover {
+    background: #218838;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    margin: 0;
+}
+
+.panel-header .export-buttons {
+    margin: 0;
 } 
