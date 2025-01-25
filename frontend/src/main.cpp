@@ -244,6 +244,34 @@ void export_all_universes(webui::window::event* e) {
     }
 }
 
+// Add search handler
+void search_universes(webui::window::event* e) {
+    try {
+        auto data = json::parse(e->get_string());
+        std::string searchTerm = data["term"].get<std::string>();
+        
+        // Search universes
+        auto universes = UniverseDB::instance().searchUniverses(searchTerm);
+        
+        // Convert results to JSON
+        json response;
+        response["status"] = "success";
+        json universe_list = json::array();
+        int id = 0;
+        for (auto& universe : universes) {
+            universe_list.push_back(universe_to_json(universe.get(), id++));
+        }
+        response["universes"] = universe_list;
+        
+        e->return_string(response.dump());
+    } catch (const std::exception& ex) {
+        json error;
+        error["status"] = "error";
+        error["message"] = ex.what();
+        e->return_string(error.dump());
+    }
+}
+
 int main() {
     webui::window win;
     
@@ -255,7 +283,8 @@ int main() {
     win.bind("getUniverses", get_universes);
     win.bind("deleteUniverse", delete_universe);
     win.bind("exportUniverse", export_universe);
-    win.bind("exportAllUniverses", export_all_universes);  // Add new binding
+    win.bind("exportAllUniverses", export_all_universes);
+    win.bind("searchUniverses", search_universes);  // Add new binding
     
     // Show the UI starting with index.html
     win.show("index.html");

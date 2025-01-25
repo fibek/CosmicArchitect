@@ -341,6 +341,62 @@ async function exportAllUniverses(format) {
     }
 }
 
+// Debounce function to limit API calls
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Search function
+const searchUniverses = debounce(async (term) => {
+    try {
+        if (!term.trim()) {
+            // If search is empty, show all universes
+            loadUniverseList();
+            return;
+        }
+
+        const response = await webui.call('searchUniverses', JSON.stringify({ term }));
+        const data = JSON.parse(response);
+        
+        if (data.status === 'success') {
+            const universeList = document.getElementById('universe-list');
+            universeList.innerHTML = '';
+            
+            if (data.universes.length === 0) {
+                universeList.innerHTML = '<p>No universes found matching your search.</p>';
+                return;
+            }
+            
+            data.universes.forEach(universe => {
+                const item = document.createElement('div');
+                item.className = 'universe-item';
+                item.innerHTML = `
+                    <h3>${universe.name}</h3>
+                    <p>Matter Density: ${universe.matterDensity}</p>
+                    <p>Dark Energy Density: ${universe.darkEnergyDensity}</p>
+                    <div class="universe-actions">
+                        <button onclick="viewUniverse(${universe.id})">View Details</button>
+                        <button class="delete-btn" onclick="deleteUniverse(${universe.id}, '${universe.name}')">Delete</button>
+                    </div>
+                `;
+                universeList.appendChild(item);
+            });
+        } else {
+            console.error('Failed to search universes:', data.message);
+        }
+    } catch (error) {
+        console.error('Error searching universes:', error);
+    }
+}, 300); // 300ms debounce delay
+
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {
     showDashboard();
