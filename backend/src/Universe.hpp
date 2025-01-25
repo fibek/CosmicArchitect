@@ -16,7 +16,7 @@ public:
     virtual ~Universe() = default;
 
     // Pure virtual method for timeline generation
-    virtual std::unique_ptr<Timeline> generateTimeline() = 0;
+    virtual std::unique_ptr<Timeline> generateTimeline() const = 0;
 
     // Static methods for universe tracking
     static int getTotalUniverses();
