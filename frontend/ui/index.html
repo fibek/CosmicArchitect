@@ -1,101 +1,222 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="webui.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cosmic Architect</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="webui.js"></script>
 </head>
-<body>
-    <div class="container">
+<body class="has-background-dark">
+    <div class="container is-fluid">
         <!-- Header -->
-        <div class="header">
-            <h1>Cosmic Architect</h1>
-            <div>Total Universes: <span id="universe-count">0</span></div>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <nav class="tabs">
-            <button class="tab active" onclick="showDashboard()">Dashboard</button>
-            <button class="tab" onclick="showUniverseDetail()">Universe Detail</button>
+        <nav class="navbar is-transparent mb-5">
+            <div class="navbar-brand">
+                <h1 class="navbar-item title has-text-light is-3">
+                    <i class="fas fa-galaxy mr-2"></i>
+                    Cosmic Architect
+                </h1>
+            </div>
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <span class="tag is-info is-medium">
+                        <i class="fas fa-universe mr-2"></i>
+                        Total Universes: <span id="universe-count" class="ml-2">0</span>
+                    </span>
+                </div>
+            </div>
         </nav>
 
-        <!-- Main Dashboard -->
-        <div id="main-dashboard" class="dashboard">
-            <!-- Universe Creation Form -->
-            <div class="panel">
-                <h2>Create New Universe</h2>
-                <form id="universe-form" class="universe-form">
-                    <div class="form-group">
-                        <label for="universe-name">Universe Name:</label>
-                        <input type="text" id="universe-name" name="name" placeholder="Enter a name for your universe" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="matter-density" title="Total matter density relative to critical density (0.1-2.0)">Matter Density (Ω_m):</label>
-                        <input type="number" id="matter-density" name="matterDensity" step="0.1" min="0.1" max="2.0" value="0.3" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dark-energy-density" title="Dark energy density relative to critical density (0.0-1.0)">Dark Energy Density (Ω_Λ):</label>
-                        <input type="number" id="dark-energy-density" name="darkEnergyDensity" step="0.1" min="0.0" max="1.0" value="0.7" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="hubble-constant" title="Current expansion rate in km/s/Mpc (50-80)">Hubble Constant (H₀):</label>
-                        <input type="number" id="hubble-constant" name="hubbleConstant" step="1" min="50" max="80" value="70" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="matter-antimatter-ratio" title="Baryon asymmetry (1e-11 to 1e-7)">Matter/Antimatter Ratio:</label>
-                        <input type="number" id="matter-antimatter-ratio" name="matterAntimatterRatio" step="1e-11" min="1e-11" max="1e-7" value="1e-9" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dark-energy-w" title="Dark energy equation of state (-2.0 to -0.5)">Dark Energy W:</label>
-                        <input type="number" id="dark-energy-w" name="darkEnergyW" step="0.1" min="-2.0" max="-0.5" value="-1.0" required>
-                    </div>
-                    <button type="submit">Create Universe</button>
-                </form>
+        <!-- Main Content -->
+        <div class="columns is-multiline">
+            <!-- Universe Creation Panel -->
+            <div class="column is-one-third">
+                <div class="box has-background-grey-darker">
+                    <h2 class="title is-4 has-text-light mb-4">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Create New Universe
+                    </h2>
+                    <form id="universe-form">
+                        <div class="field">
+                            <label class="label has-text-light">
+                                <i class="fas fa-tag mr-1"></i>
+                                Universe Name
+                            </label>
+                            <div class="control">
+                                <input class="input" type="text" name="name" placeholder="Enter a name for your universe" required>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <div class="field">
+                                <label class="label has-text-light" title="Total matter density relative to critical density (0.1-2.0)">
+                                    <i class="fas fa-atom mr-1"></i>
+                                    Matter Density (Ω_m)
+                                </label>
+                                <div class="control">
+                                    <input class="input" type="number" name="matterDensity" step="0.01" min="0.1" max="2.0" value="0.3" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label has-text-light" title="Dark energy density relative to critical density (0.0-1.0)">
+                                    <i class="fas fa-ghost mr-1"></i>
+                                    Dark Energy Density (Ω_Λ)
+                                </label>
+                                <div class="control">
+                                    <input class="input" type="number" name="darkEnergyDensity" step="0.01" min="0.0" max="1.0" value="0.7" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label has-text-light" title="Current expansion rate in km/s/Mpc (50-80)">
+                                    <i class="fas fa-expand-arrows-alt mr-1"></i>
+                                    Hubble Constant (H₀)
+                                </label>
+                                <div class="control">
+                                    <input class="input" type="number" name="hubbleConstant" step="0.1" min="50" max="80" value="70" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label has-text-light" title="Baryon asymmetry (1e-11 to 1e-7)">
+                                    <i class="fas fa-balance-scale mr-1"></i>
+                                    Matter/Antimatter Ratio
+                                </label>
+                                <div class="control">
+                                    <input class="input" type="number" name="matterAntimatterRatio" step="any" min="1e-11" max="1e-7" value="1e-9" required>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="label has-text-light" title="Dark energy equation of state (-2.0 to -0.5)">
+                                    <i class="fas fa-wave-square mr-1"></i>
+                                    Dark Energy W
+                                </label>
+                                <div class="control">
+                                    <input class="input" type="number" name="darkEnergyW" step="0.01" min="-2.0" max="-0.5" value="-1.0" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field mt-5">
+                            <div class="control">
+                                <button type="submit" class="button is-primary is-fullwidth">
+                                    <i class="fas fa-magic mr-2"></i>
+                                    Create Universe
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <!-- Universe List -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>Created Universes</h2>
-                    <div class="export-buttons">
-                        <button onclick="exportAllUniverses('json')" class="export-btn">Export All as JSON</button>
-                        <button onclick="exportAllUniverses('csv')" class="export-btn">Export All as CSV</button>
+            <!-- Universe List and Details -->
+            <div class="column is-two-thirds">
+                <!-- Search and Export Controls -->
+                <div class="box has-background-grey-darker mb-4">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <div class="field">
+                                    <div class="control has-icons-left">
+                                        <input class="input" type="text" id="universe-search" 
+                                               placeholder="Search universes by name..." 
+                                               oninput="searchUniverses(this.value)">
+                                        <span class="icon is-left">
+                                            <i class="fas fa-search"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <div class="buttons">
+                                    <button onclick="exportAllUniverses('json')" class="button is-success">
+                                        <i class="fas fa-file-download mr-2"></i>
+                                        Export All as JSON
+                                    </button>
+                                    <button onclick="exportAllUniverses('csv')" class="button is-success">
+                                        <i class="fas fa-file-csv mr-2"></i>
+                                        Export All as CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="search-box">
-                    <input type="text" id="universe-search" placeholder="Search universes by name..." 
-                           oninput="searchUniverses(this.value)">
-                </div>
+
+                <!-- Universe List -->
                 <div id="universe-list" class="universe-list">
                     <!-- Universe items will be dynamically added here -->
                 </div>
-            </div>
-        </div>
 
-        <!-- Universe Detail View (Hidden by default) -->
-        <div id="universe-detail" class="panel">
-            <h2>Universe Details</h2>
-            
-            <!-- Universe Parameters -->
-            <div id="universe-params" class="universe-info">
-                <!-- Parameters will be dynamically added here -->
-            </div>
+                <!-- Universe Detail View -->
+                <div id="universe-detail" class="box has-background-grey-darker" style="display: none;">
+                    <div class="level mb-4">
+                        <div class="level-left">
+                            <div class="buttons">
+                                <button onclick="showDashboard()" class="button is-light is-small mr-2">
+                                    <i class="fas fa-arrow-left mr-1"></i>
+                                    Back
+                                </button>
+                                <button onclick="showTimeline()" class="button is-info is-small">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    View Timeline
+                                </button>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="buttons">
+                                <button onclick="exportUniverse('json')" class="button is-success is-small">
+                                    <i class="fas fa-file-download mr-1"></i>
+                                    Export as JSON
+                                </button>
+                                <button onclick="exportUniverse('csv')" class="button is-success is-small">
+                                    <i class="fas fa-file-csv mr-1"></i>
+                                    Export as CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Universe Parameters -->
+                    <div id="universe-params" class="universe-info">
+                        <!-- Parameters will be dynamically added here -->
+                    </div>
+                </div>
 
-            <!-- Export buttons -->
-            <div class="export-buttons">
-                <button onclick="exportUniverse('json')" class="export-btn">Export as JSON</button>
-                <button onclick="exportUniverse('csv')" class="export-btn">Export as CSV</button>
-            </div>
-
-            <!-- Timeline -->
-            <div class="timeline">
-                <h3>Timeline</h3>
-                <div id="milestone-timeline" class="milestone-timeline">
-                    <!-- Milestones will be dynamically added here -->
+                <!-- Timeline View -->
+                <div id="timeline-view" class="box has-background-grey-darker" style="display: none;">
+                    <div class="level mb-4">
+                        <div class="level-left">
+                            <button onclick="hideTimeline()" class="button is-light is-small">
+                                <i class="fas fa-arrow-left mr-1"></i>
+                                Back to Details
+                            </button>
+                        </div>
+                        <div class="level-right">
+                            <h2 class="title is-4 has-text-light mb-0">
+                                <i class="fas fa-clock mr-2"></i>
+                                Universe Timeline
+                            </h2>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-section mt-6">
+                        <div id="milestone-timeline" class="timeline">
+                            <!-- Milestones will be dynamically added here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="app.js"></script>
 </body>
 </html> 
