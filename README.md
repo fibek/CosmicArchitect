@@ -84,16 +84,17 @@ timeline->saveToFile("universe_timeline.json");
 
 ```bash
 # Create build directory
-mkdir -p backend/build
-cd backend/build
+mkdir -p build
+cd build
 
 # Configure and build
 cmake ..
 make
 
-# Run tests
-./tests/milestone_tests
+# Run UI
+./frontend/cosmic_architect_ui
 ```
+![image](https://github.com/user-attachments/assets/1cdb63a3-4228-400a-96e3-b20e43798a00)
 
 ## Dependencies
 - C++17 or later
